@@ -1,9 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
+GENDER_CHOICES = (
+    (0, 'Male'),
+    (1, 'Female'),
+    (2, 'Not to disclose')
+)
 
 class UserManager(BaseUserManager):
-    def _create_user(self, email, username, password, **extra_fields):
+    def _create_user(self, email, username, password, gender=2, **extra_fields):
         """
         Create and save a user with the given username, email, and password.
         """
@@ -11,7 +16,7 @@ class UserManager(BaseUserManager):
             raise ValueError('The given email must be set')
         email = self.normalize_email(email)
         username = self.model.normalize_username(username)
-        user = self.model(email=email, username=username, **extra_fields)
+        user = self.model(email=email, username=username, gender=gender, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -35,8 +40,8 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     email = models.EmailField(verbose_name='email', max_length=255, unique=True)
-
     username = models.CharField(max_length=30)
+    gender = models.SmallIntegerField(choices=GENDER_CHOICES)
 
     objects = UserManager()
     USERNAME_FIELD = 'email'

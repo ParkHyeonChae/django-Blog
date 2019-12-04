@@ -8,8 +8,8 @@ def register(request):
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data['password'])
             user.save()
-            return render(request, 'registration/login.html', {'user':user})
+            return render(request, 'register.html', {'user':user})
     else:
         user_form = RegisterForm()
 
-    return render(request, 'registration/register.html', {'user_form':user_form})
+    return render(request, 'register.html', {'user_form':user_form})
