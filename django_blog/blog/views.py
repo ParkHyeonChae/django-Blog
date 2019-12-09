@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
-# ex) q = get_object_or_404(Question, pk=id) 1번째 Model, 2번쨰 인자는 Keyword, Keyword 없을 시 404 error 발생.
+# ex) q = get_object_or_404(Question, pk=id) 1번째 Model, 2번째 인자는 Keyword, Keyword 없을 시 404 error 발생.
 from django.urls import reverse
 from blog.models import Post
 

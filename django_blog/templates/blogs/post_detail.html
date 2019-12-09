@@ -1,0 +1,15 @@
+{% extends "blogs/_base.html" %}
+{% load social_share %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <!-- 글 본문 -->
+            <h1>{{ post.title }}</h1>
+            <hr>
+            {% if post.image %}
+            <img src="{{ post.image.url }}">
+            {% endif %}
+            <p>{{ post.content }}</p>
+        </div>
+    </div>
