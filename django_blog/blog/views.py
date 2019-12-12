@@ -1,8 +1,9 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render, redirect
-# ex) q = get_object_or_404(Question, pk=id) 1번째 Model, 2번째 인자는 Keyword, Keyword 없을 시 404 error 발생.
-from django.urls import reverse
-from blog.models import Post
+from django.shortcuts import get_object_or_404, render, redirect, reverse # ex) q = get_object_or_404(Question, pk=id) 1번째 Model, 2번째 인자는 Keyword, Keyword 없을 시 404 error 발생.
+from django.http import HttpResponse, HttpResponseRedirect
+from django.template.loader import render_to_string
+from django.views.decorators.http import require_POST
+from blog.models import Post, Comment
 
 
 def posts_list(request):
@@ -12,8 +13,26 @@ def posts_list(request):
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
+    Comments = Comment.objects.filter(post=post.id)
+    is_liked = False
 
-    return render(request, 'blogs/post_detail.html', context={'post':post})
+    if post.likes.filter(id=request.user.id).exists():
+        is_liked = True
+
+    return render(request, 'blogs/post_detail.html', context={'post':post, 'comments':Comments, 'is_liked':is_liked, 'total_likes':post.total_likes()})
+
+@login_required
+@require_POST
+def post_like(request):
+    post = get_object_or_404(Post, id=request.POST.get('post_id'))
+    is_liked = post.likes.filter(id=request.user.id).exists()
+
+    if is_liked:
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
+
+    return HttpResponseRedirect(reverse('post_detail', kwargs={'post_id': post.id}))
 
 @login_required
 def post_write(request):
