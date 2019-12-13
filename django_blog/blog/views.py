@@ -54,3 +54,20 @@ def post_write(request):
             return redirect(reverse('post_detail', kwargs={'post_id': post.id}))
     
     return render(request, 'blogs/post_write.html', {'user':request.user, 'errors':errors})
+
+@login_required
+def comment_write(request):
+    errors = []
+    if request.method == 'POST':
+        post_id = request.POST.get('post_id', '').strip()
+        content = request.POST.get('content', '').strip()
+
+        if not content:
+            errors.append('댓글을 입력해주세요.')
+
+        if not errors:
+            comment = Comment.objects.create(user=request.user, post_id=post_id, content=content)
+
+            return redirect(reverse('post_detail', kwargs={'post_id': comment.post.id}))
+    
+    return render(request, 'blogs/post_detail.html', {'user':request.user, 'errors':errors} )
