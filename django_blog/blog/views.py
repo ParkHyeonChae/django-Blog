@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 from blog.models import Post, Comment
+import json
 
 
 def posts_list(request):
@@ -71,3 +72,21 @@ def comment_write(request):
             return redirect(reverse('post_detail', kwargs={'post_id': comment.post.id}))
     
     return render(request, 'blogs/post_detail.html', {'user':request.user, 'errors':errors} )
+
+@login_required
+@require_POST
+def like_toggle(request):
+    if request.method == 'POST':
+        user = request.user 
+        post_id = request.POST.get('pk', '')
+        post = Post.objects.get(pk=post_id)
+
+        if post.like.filter(id=user.id).exists(): 
+            post.like.remove(user) 
+            message = 'Dislike'
+        else:
+            post.like.add(user)
+            message = 'Like'
+
+    context = {'like_count' : post.total_like, 'message' : message}
+    return HttpResponse(json.dumps(context), content_type='application/json')
